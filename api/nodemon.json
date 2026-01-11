@@ -1,0 +1,6 @@
+{
+    "watch":["src"],
+    "ext":"ts",
+    "exclude":["node_modules"],
+    "exec":"tsx src/server"
+}
