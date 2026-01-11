@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser'
 import responseHandler from './middlewares/responseHanlder'
 import errorHandler from './middlewares/errorHandler'
 
+import productRoutes from './routes/product.routes'
+import categoryRoutes from './routes/category.routes'
 
 const app = express()
 
@@ -11,11 +13,8 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(responseHandler)
 
-
-
-
-
-
+app.use('/api/products', productRoutes)
+app.use('/api/categories', categoryRoutes)
 
 
 
