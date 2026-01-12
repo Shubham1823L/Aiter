@@ -1,11 +1,11 @@
 import express from 'express'
 import asyncHandler from '../middlewares/asyncHandler'
-import { getProduct, getProducts } from '../controllers/product.controllers'
+import { listProductHandler, listProductsHandler } from '../controllers/product.controllers'
 
 const router = express.Router()
 
-router.get('/', asyncHandler(getProducts))
+router.get('/', asyncHandler(listProductsHandler))
 
-router.get('/:productId', asyncHandler(getProduct))
+router.get('/:productId', asyncHandler(listProductHandler))
 
 export default router

@@ -1,8 +1,7 @@
 import { RequestHandler } from "express";
-import prisma from "../config/prisma";
+import { getCategories } from "../services/menuService";
 
-export const getCategories: RequestHandler = async (req, res) => {
-    const categories = await prisma.category.findMany({})
-
+export const listCategoriesHandler: RequestHandler = async (req, res) => {
+    const categories = await getCategories()
     return res.success(200, { categories })
 }
