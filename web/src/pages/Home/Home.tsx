@@ -1,9 +1,33 @@
 import clsx from 'clsx'
 import styles from './home.module.css'
 import { ArrowUp } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
+type Message = {
+  text: string
+}
 
 const Home = () => {
+  const [messages, setMessages] = useState<Message[]>([{ text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }])
+
+  useEffect(() => {
+    const eventSource = new EventSource('/api/chat/stream')
+    console.log('connected')
+    eventSource.onmessage = (e) => {
+      const newMessage = { text: e.data }
+      setMessages(prev => [...prev, newMessage])
+    }
+
+    eventSource.onerror = (e) => {
+      console.error(e)
+      eventSource.close()
+    }
+
+    return () => {
+      eventSource.close()
+    }
+  }, [])
+
   return (
     <div className={styles.wrapper}>
       <h1 className={styles.heading}>
@@ -11,12 +35,18 @@ const Home = () => {
       </h1>
       <div className={styles.chatArea}>
         <div className={styles.messages}>
-          <div className={clsx(styles.message,styles.myMessage)}>
+          <div className={clsx(styles.message, styles.myMessage)}>
             Hey, what are the available items over here? can u show me the whole menu?
           </div>
-          <div className={styles.message}>
-           Hi, Shubham. My name is Aiter . I am an AI, i can do a lot of things including what you just asked, your menu is...
-          </div>
+          {
+            messages.map((msg, i) => {
+              return (
+                <div key={i} className={clsx(styles.message)}>
+                  {msg.text}
+                </div>
+              )
+            })
+          }
         </div>
         <div className={styles.inputWrapper}>
           <input className={styles.input} type="text" />

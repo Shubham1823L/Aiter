@@ -6,6 +6,7 @@ import errorHandler from './middlewares/errorHandler'
 
 import productRoutes from './routes/product.routes'
 import categoryRoutes from './routes/category.routes'
+import chatRoutes from './routes/chat.routes'
 
 const app = express()
 
@@ -15,6 +16,7 @@ app.use(responseHandler)
 
 app.use('/api/products', productRoutes)
 app.use('/api/categories', categoryRoutes)
+app.use('/api/chat',chatRoutes)
 
 
 
