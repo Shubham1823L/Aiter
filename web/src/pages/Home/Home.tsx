@@ -1,32 +1,29 @@
 import clsx from 'clsx'
 import styles from './home.module.css'
 import { ArrowUp } from 'lucide-react'
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 
-type Message = {
-  text: string
-}
+// type Message = {
+//   text: string
+// }
 
 const Home = () => {
-  const [messages, setMessages] = useState<Message[]>([{ text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }, { text: 'a' }])
+  // const [messages, setMessages] = useState<Message[]>([])
 
-  useEffect(() => {
-    const eventSource = new EventSource('/api/chat/stream')
-    console.log('connected')
-    eventSource.onmessage = (e) => {
-      const newMessage = { text: e.data }
-      setMessages(prev => [...prev, newMessage])
-    }
+  // useEffect(() => {
+  //   const eventSource = new EventSource('/api/chat/stream')
+  //   eventSource.onmessage = (e) => {
+  //   }
 
-    eventSource.onerror = (e) => {
-      console.error(e)
-      eventSource.close()
-    }
+  //   eventSource.onerror = (e) => {
+  //     console.error(e)
+  //     eventSource.close()
+  //   }
 
-    return () => {
-      eventSource.close()
-    }
-  }, [])
+  //   return () => {
+  //     eventSource.close()
+  //   }
+  // }, [])
 
   return (
     <div className={styles.wrapper}>
@@ -38,15 +35,7 @@ const Home = () => {
           <div className={clsx(styles.message, styles.myMessage)}>
             Hey, what are the available items over here? can u show me the whole menu?
           </div>
-          {
-            messages.map((msg, i) => {
-              return (
-                <div key={i} className={clsx(styles.message)}>
-                  {msg.text}
-                </div>
-              )
-            })
-          }
+         
         </div>
         <div className={styles.inputWrapper}>
           <input className={styles.input} type="text" />

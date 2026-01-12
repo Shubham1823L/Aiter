@@ -1,13 +1,13 @@
 import express from 'express'
 import asyncHandler from '../middlewares/asyncHandler'
-import { createConversatonId, deleteConversationId, streamLLMResponse } from '../controllers/chat.controllers'
+import { createConversatonIdHandler, deleteConversationIdHandler, streamLLMResponseHandler } from '../controllers/chat.controllers'
 
 const router = express.Router()
 
-router.post('/', asyncHandler(createConversatonId))
+router.post('/', asyncHandler(createConversatonIdHandler))
 
-router.delete('/', asyncHandler(deleteConversationId))
+router.delete('/', asyncHandler(deleteConversationIdHandler))
 
-router.get('/stream',streamLLMResponse)
+router.get('/stream', streamLLMResponseHandler)
 
 export default router
