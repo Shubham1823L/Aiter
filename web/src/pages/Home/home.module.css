@@ -55,7 +55,7 @@
     align-items: center;
     padding: .8em 1.5em;
 
-    >svg {
+    >button {
         border-radius: 50%;
         background-color: var(--font-neutral);
         color: var(--neutral);

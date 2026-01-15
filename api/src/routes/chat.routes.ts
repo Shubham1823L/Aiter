@@ -6,8 +6,10 @@ const router = express.Router()
 
 router.post('/', asyncHandler(createConversatonIdHandler))
 
-router.delete('/', asyncHandler(deleteConversationIdHandler))
+router.delete('/:conversationId', asyncHandler(deleteConversationIdHandler))
 
-router.get('/stream', streamLLMResponseHandler)
+router.post('/stream/:conversationId', asyncHandler(streamLLMResponseHandler))
+
+
 
 export default router

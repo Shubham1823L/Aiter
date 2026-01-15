@@ -6,6 +6,4 @@ const api = axios.create({
     withCredentials: true
 })
 
-api.interceptors.request.use({
-    
-})
+export default api
