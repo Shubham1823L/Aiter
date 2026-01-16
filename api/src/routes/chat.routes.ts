@@ -8,6 +8,8 @@ router.post('/', asyncHandler(createConversatonIdHandler))
 
 router.delete('/', asyncHandler(deleteConversationIdHandler))
 
-router.get('/stream', streamLLMResponseHandler)
+router.post('/stream', asyncHandler(streamLLMResponseHandler))
+
+
 
 export default router

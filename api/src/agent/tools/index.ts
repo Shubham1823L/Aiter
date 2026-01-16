@@ -1,8 +1,8 @@
-import { Tool } from "@openai/agents"
+import { getCategoriesTool, getProductsTool } from "./menu.tools"
 
 
-const tools: Tool[] = [
-    
+const tools = [
+    getCategoriesTool, getProductsTool
 ]
 
 export default tools

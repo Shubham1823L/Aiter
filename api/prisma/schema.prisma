@@ -5,28 +5,32 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  createdAt DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+  id        String                       @id @default(uuid())
+  name      String                       @unique
+  createdAt DateTime                     @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime                     @default(now()) @updatedAt @db.Timestamptz(3)
+  embedding Unsupported("vector(1536)")?
   products  Product[]
 }
 
 model Product {
-  id         String   @id @default(uuid())
+  id         String                       @id @default(uuid())
   name       String
   price      Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category                     @relation(fields: [categoryId], references: [id])
   categoryId String
+  embedding  Unsupported("vector(1536)")?
 
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)

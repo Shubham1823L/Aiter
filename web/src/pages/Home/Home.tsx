@@ -1,29 +1,97 @@
 import clsx from 'clsx'
 import styles from './home.module.css'
 import { ArrowUp } from 'lucide-react'
-// import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import decode from '@/utils/decoder'
+import api from '@/api/axios'
+import Markdown from 'react-markdown'
 
-// type Message = {
-//   text: string
-// }
+type AgentMessage = {
+  author: 'agent',
+  text: string[]
+}
+type UserMessage = {
+  author: 'user',
+  text: string
+}
+
+type Message = AgentMessage | UserMessage
 
 const Home = () => {
-  // const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [message, setMessage] = useState<AgentMessage>({ author: 'agent', text: [] })
+  const [prompt, setPrompt] = useState<UserMessage>({ author: 'user', text: '' })
+  const [thinking, setThinking] = useState(false)
 
-  // useEffect(() => {
-  //   const eventSource = new EventSource('/api/chat/stream')
-  //   eventSource.onmessage = (e) => {
-  //   }
 
-  //   eventSource.onerror = (e) => {
-  //     console.error(e)
-  //     eventSource.close()
-  //   }
+  useEffect(() => {
+    (async () => {
+      try {
+        await api.post('/chat')
+      } catch (error) {
+        console.error(error)
+      }
+    })()
 
-  //   return () => {
-  //     eventSource.close()
-  //   }
-  // }, [])
+    return () => {
+      api.delete('/chat')
+    }
+
+  }, [])
+
+
+
+  const handlePrompt = async () => {
+    const controller = new AbortController()
+    const signal = controller.signal
+    setMessages(prev => [...prev, prompt])
+    setPrompt({ author: 'user', text: '' })
+    setThinking(true)
+    setMessage({ author: 'agent', text: [] })
+
+
+    fetch(`/api/chat/stream`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt: prompt.text }),
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      signal
+    }).then(async (res) => {
+      setThinking(false)
+
+      if (!res.ok) return console.error("ERROR", res.status)
+
+      const reader = res.body?.getReader()
+      if (!reader) return console.error("ERROR")
+
+      let isDone = false
+      while (!isDone) {
+        const { value, done } = await reader.read()
+        isDone = done
+
+        if (!value) continue
+
+        setMessage(prev => ({ ...prev, text: [...prev.text, decode(value)] }))
+      }
+
+      setMessage(msg => {
+        setMessages(prev => [...prev, msg])
+        console.log([...msg.text].join(''))
+        return { author: 'agent', text: [] }
+      })
+
+    }).catch(err => {
+      setThinking(false)
+      console.error(err)
+    })
+
+
+
+
+
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -32,19 +100,40 @@ const Home = () => {
       </h1>
       <div className={styles.chatArea}>
         <div className={styles.messages}>
-          <div className={clsx(styles.message, styles.myMessage)}>
-            Hey, what are the available items over here? can u show me the whole menu?
-          </div>
-         
+          {messages.map((msg, i) => {
+
+            return (
+              <div key={i} className={clsx(styles.message, msg.author == 'user' && styles.myMessage)}>
+                {msg.author === 'agent' ? <Markdown>
+                  {msg.text.join('')}
+                </Markdown> : msg.text}
+
+              </div>
+            )
+
+          })}
+          {
+            message.text.length != 0 && <div className={styles.message}>
+              <Markdown>{message.text.join('')}</Markdown>
+            </div>
+          }
+          {
+            thinking && message.text.length == 0 && <div className={styles.message}>Thinking....</div>
+          }
         </div>
         <div className={styles.inputWrapper}>
-          <input className={styles.input} type="text" />
-          <ArrowUp strokeWidth={1.8} role='button' />
+          <input onKeyDown={(e) => {
+            if (e.key === "Enter") handlePrompt()
+          }} onChange={(e) => setPrompt({ author: 'user', text: e.target.value })} value={prompt.text} className={styles.input} type="text" />
+          <button disabled={thinking} className={thinking ? 'disabledBtn' : ""} onClick={handlePrompt}>
+            <ArrowUp strokeWidth={1.8} />
+          </button>
+
         </div>
         <p className={styles.chatFooterInfo}>Your personal waiter, packed with Artifical Intelligence</p>
 
       </div>
-    </div>
+    </div >
   )
 }
 
