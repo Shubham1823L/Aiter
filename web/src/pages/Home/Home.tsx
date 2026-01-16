@@ -78,7 +78,6 @@ const Home = () => {
 
       setMessage(msg => {
         setMessages(prev => [...prev, msg])
-        console.log([...msg.text].join(''))
         return { author: 'agent', text: [] }
       })
 

@@ -45,9 +45,10 @@ export const streamLLMResponseHandler: RequestHandler = async (req, res) => {
 
     stream.toTextStream({ compatibleWithNodeStreams: true }).on('data', (e) => {
         res.write(e.toString())
-
     }).on('end', () => {
         res.end()
+    }).on('error', (e) => {
+        console.error(e)
+        return res.fail()
     })
-
 }
