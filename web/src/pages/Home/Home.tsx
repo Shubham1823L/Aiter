@@ -1,10 +1,11 @@
 import clsx from 'clsx'
 import styles from './home.module.css'
 import { ArrowUp } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import decode from '@/utils/decoder'
 import api from '@/api/axios'
 import Markdown from 'react-markdown'
+import { toast } from 'sonner'
 
 type AgentMessage = {
   author: 'agent',
@@ -22,7 +23,7 @@ const Home = () => {
   const [message, setMessage] = useState<AgentMessage>({ author: 'agent', text: [] })
   const [prompt, setPrompt] = useState<UserMessage>({ author: 'user', text: '' })
   const [thinking, setThinking] = useState(false)
-
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     (async () => {
@@ -39,11 +40,22 @@ const Home = () => {
 
   }, [])
 
+  useEffect(() => {
+    if (!ref.current) return
+    ref.current.scrollTop = ref.current.scrollHeight
+
+  }, [message, messages])
+
 
 
   const handlePrompt = async () => {
+    if (prompt.text.length == 0) return toast.error('Invalid Input', {
+      description: 'Input cannot be empty'
+    })
+
     const controller = new AbortController()
     const signal = controller.signal
+
     setMessages(prev => [...prev, prompt])
     setPrompt({ author: 'user', text: '' })
     setThinking(true)
@@ -98,7 +110,7 @@ const Home = () => {
         Aiter
       </h1>
       <div className={styles.chatArea}>
-        <div className={styles.messages}>
+        <div ref={ref} className={styles.messages}>
           {messages.map((msg, i) => {
 
             return (
@@ -124,8 +136,8 @@ const Home = () => {
           <input onKeyDown={(e) => {
             if (e.key === "Enter") handlePrompt()
           }} onChange={(e) => setPrompt({ author: 'user', text: e.target.value })} value={prompt.text} className={styles.input} type="text" />
-          <button disabled={thinking} className={thinking ? 'disabledBtn' : ""} onClick={handlePrompt}>
-            <ArrowUp strokeWidth={1.8} />
+          <button disabled={thinking || prompt.text.length == 0} className={thinking || prompt.text.length == 0 ? 'disabledBtn' : ""} onClick={handlePrompt}>
+            <ArrowUp strokeWidth={2.4} />
           </button>
 
         </div>
