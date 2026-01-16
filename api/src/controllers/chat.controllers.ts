@@ -1,4 +1,4 @@
-import { run } from '@openai/agents';
+import { InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered, run } from '@openai/agents';
 import { RequestHandler } from "express";
 import client from "../config/openai";
 import agent from '../agent/llm.agent';
@@ -47,8 +47,11 @@ export const streamLLMResponseHandler: RequestHandler = async (req, res) => {
         res.write(e.toString())
     }).on('end', () => {
         res.end()
-    }).on('error', (e) => {
-        console.error(e)
+    }).on('error', (err) => {
+        if (err instanceof InputGuardrailTripwireTriggered) {
+            console.error(err.result.output.outputInfo)
+            return res.send(err.result.output.outputInfo.message ?? `Sorry i cannot answer that, feel free to ask anything about the food here :)`)
+        }
         return res.fail()
     })
 }
