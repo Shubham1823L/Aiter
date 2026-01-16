@@ -4,7 +4,7 @@ import { ArrowUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import decode from '@/utils/decoder'
 import api from '@/api/axios'
-
+import Markdown from 'react-markdown'
 
 type AgentMessage = {
   author: 'agent',
@@ -72,11 +72,13 @@ const Home = () => {
         isDone = done
 
         if (!value) continue
+
         setMessage(prev => ({ ...prev, text: [...prev.text, decode(value)] }))
       }
 
       setMessage(msg => {
         setMessages(prev => [...prev, msg])
+        console.log([...msg.text].join(''))
         return { author: 'agent', text: [] }
       })
 
@@ -102,14 +104,17 @@ const Home = () => {
 
             return (
               <div key={i} className={clsx(styles.message, msg.author == 'user' && styles.myMessage)}>
-                {msg.text}
+                {msg.author === 'agent' ? <Markdown>
+                  {msg.text.join('')}
+                </Markdown> : msg.text}
+
               </div>
             )
 
           })}
           {
             message.text.length != 0 && <div className={styles.message}>
-              {message.text.map(fragment => fragment)}
+              <Markdown>{message.text.join('')}</Markdown>
             </div>
           }
           {

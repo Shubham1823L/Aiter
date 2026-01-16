@@ -22,6 +22,8 @@ export const deleteConversationIdHandler: RequestHandler = async (req, res) => {
     if (!conversationId || typeof conversationId !== 'string' || !conversationId.startsWith('conv_')) return res.fail(400, "BAD_REQUEST", "Invalid conversation id")
 
     await client.conversations.delete(conversationId)
+
+
     res.clearCookie('oai-cid', {
         //Session cookie - will expire when browser/app closes
         httpOnly: true,
