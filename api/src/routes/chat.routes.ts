@@ -6,9 +6,9 @@ const router = express.Router()
 
 router.post('/', asyncHandler(createConversatonIdHandler))
 
-router.delete('/:conversationId', asyncHandler(deleteConversationIdHandler))
+router.delete('/', asyncHandler(deleteConversationIdHandler))
 
-router.post('/stream/:conversationId', asyncHandler(streamLLMResponseHandler))
+router.post('/stream', asyncHandler(streamLLMResponseHandler))
 
 
 
