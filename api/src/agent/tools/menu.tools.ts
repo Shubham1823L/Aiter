@@ -46,7 +46,5 @@ export const getProductsTool = tool({
             console.error('Something went wrong')
             return "Sorry, nothing found"
         }
-
-
     }
 })

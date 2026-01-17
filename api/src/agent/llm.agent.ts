@@ -1,10 +1,9 @@
+import { AgentOutputTypeSchema } from '../schemas/schemas';
 import 'dotenv/config'
-import { Agent, run } from "@openai/agents";
-import { stdout } from 'node:process';
-
-import client from '../config/openai';
+import { Agent } from "@openai/agents";
 import tools from './tools';
-import { inputGuardrails, outputGuardrails } from './guards';
+import { inputGuardrails } from './guards';
+
 
 
 const agent = new Agent({
@@ -13,8 +12,7 @@ const agent = new Agent({
     model: 'gpt-4o-mini',
     tools,
     inputGuardrails,
-
-   
+    outputType: AgentOutputTypeSchema
 });
 
 export default agent;

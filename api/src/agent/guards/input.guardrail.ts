@@ -28,6 +28,7 @@ const restaurantInputGuardrail: InputGuardrail = {
     execute: async ({ input }) => {
         const result = await run(inputGuard, input)
         const output = result.finalOutput as z.infer<typeof InputGuardOutputSchema>
+        console.log(result.finalOutput)
 
 
         return {
