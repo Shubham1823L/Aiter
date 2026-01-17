@@ -8,10 +8,11 @@ import { useEffect, useRef } from 'react'
 type MessagesProps = {
     messages: Message[],
     thinking: boolean,
+    handleChoiceSubmission: (productId: string) => void
 }
 
 
-const Messages = ({ messages, thinking }: MessagesProps) => {
+const Messages = ({ messages, thinking, handleChoiceSubmission }: MessagesProps) => {
     const ref = useRef<HTMLDivElement>(null)
 
 
@@ -19,7 +20,7 @@ const Messages = ({ messages, thinking }: MessagesProps) => {
         if (!ref.current) return
         ref.current.scrollTop = ref.current.scrollHeight
 
-    }, [messages])
+    }, [messages, thinking])
 
 
 
@@ -45,7 +46,7 @@ const Messages = ({ messages, thinking }: MessagesProps) => {
                                                         <label className={styles.formLabel} htmlFor={option.product_id + i}>
                                                             <span>{option.product_name}</span><span>{option.product_price}</span>
                                                         </label>
-                                                        <input disabled={!isActive || thinking} className={styles.formInput} id={option.product_id + i} type="checkbox" />
+                                                        <input onChange={() => handleChoiceSubmission(option.product_id)} name='product' disabled={!isActive || thinking} className={styles.formInput} id={option.product_id + i} type="radio" />
                                                     </div>
                                                 )
 

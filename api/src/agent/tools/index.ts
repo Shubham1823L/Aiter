@@ -1,8 +1,9 @@
-import { getCategoriesTool, getProductsTool } from "./menu.tools"
+import { getCategoriesTool, getProductsTool, getProductTool } from "./menu.tools"
+import { addToCartTool } from "./order.tools"
 
 
 const tools = [
-    getCategoriesTool, getProductsTool
+    getCategoriesTool, getProductsTool, getProductTool, addToCartTool
 ]
 
 export default tools
