@@ -1,33 +1,36 @@
-import clsx from 'clsx'
 import styles from './home.module.css'
 import { ArrowUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import decode from '@/utils/decoder'
 import api from '@/api/axios'
-import Markdown from 'react-markdown'
+import { toast } from 'sonner'
+import Messages from './Messages'
+import { type OrderState } from '@/../../shared/types'
+import { AgentOutputTypeSchema } from '@/../../shared/schemas'
+import { z } from 'zod/v3'
+import { AxiosError } from 'axios'
+import type { ApiSuccess } from '@/types/types'
 
-type AgentMessage = {
+export type AgentMessage = z.infer<typeof AgentOutputTypeSchema> & {
   author: 'agent',
-  text: string[]
 }
-type UserMessage = {
+export type UserMessage = {
   author: 'user',
   text: string
 }
 
-type Message = AgentMessage | UserMessage
+export type Message = AgentMessage | UserMessage
 
 const Home = () => {
   const [messages, setMessages] = useState<Message[]>([])
-  const [message, setMessage] = useState<AgentMessage>({ author: 'agent', text: [] })
   const [prompt, setPrompt] = useState<UserMessage>({ author: 'user', text: '' })
   const [thinking, setThinking] = useState(false)
-
+  const [orderId, setOrderId] = useState('')
 
   useEffect(() => {
     (async () => {
       try {
         await api.post('/chat')
+        setOrderId(crypto.randomUUID())
       } catch (error) {
         console.error(error)
       }
@@ -39,58 +42,40 @@ const Home = () => {
 
   }, [])
 
-
-
-  const handlePrompt = async () => {
-    const controller = new AbortController()
-    const signal = controller.signal
+  const resetStates = () => {
     setMessages(prev => [...prev, prompt])
     setPrompt({ author: 'user', text: '' })
     setThinking(true)
-    setMessage({ author: 'agent', text: [] })
+  }
 
-
-    fetch(`/api/chat/stream`, {
-      method: 'POST',
-      body: JSON.stringify({ prompt: prompt.text }),
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      signal
-    }).then(async (res) => {
-      setThinking(false)
-
-      if (!res.ok) return console.error("ERROR", res.status)
-
-      const reader = res.body?.getReader()
-      if (!reader) return console.error("ERROR")
-
-      let isDone = false
-      while (!isDone) {
-        const { value, done } = await reader.read()
-        isDone = done
-
-        if (!value) continue
-
-        setMessage(prev => ({ ...prev, text: [...prev.text, decode(value)] }))
-      }
-
-      setMessage(msg => {
-        setMessages(prev => [...prev, msg])
-        console.log([...msg.text].join(''))
-        return { author: 'agent', text: [] }
-      })
-
-    }).catch(err => {
-      setThinking(false)
-      console.error(err)
+  const handlePrompt = async () => {
+    if (prompt.text.length == 0) return toast.error('Invalid Input', {
+      description: 'Input cannot be empty'
     })
 
+    resetStates()
 
+    const orderState: OrderState = { orderId: orderId, action: 'simple_query' }
+    try {
+      const response = await api.post<ApiSuccess<z.infer<typeof AgentOutputTypeSchema>>>('/chat/stream', {
+        prompt: prompt.text,
+        orderState
+      })
 
+      const { greeting_message_without_items, ui } = response.data.data
 
+      setMessages(prev => [...prev, { author: 'agent', greeting_message_without_items, ui }])
+      setThinking(false)
 
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(error.message)
+      }
+      else {
+        console.error(error)
+      }
+      setThinking(false)
+    }
   }
 
   return (
@@ -99,34 +84,15 @@ const Home = () => {
         Aiter
       </h1>
       <div className={styles.chatArea}>
-        <div className={styles.messages}>
-          {messages.map((msg, i) => {
 
-            return (
-              <div key={i} className={clsx(styles.message, msg.author == 'user' && styles.myMessage)}>
-                {msg.author === 'agent' ? <Markdown>
-                  {msg.text.join('')}
-                </Markdown> : msg.text}
+        <Messages messages={messages} thinking={thinking} />
 
-              </div>
-            )
-
-          })}
-          {
-            message.text.length != 0 && <div className={styles.message}>
-              <Markdown>{message.text.join('')}</Markdown>
-            </div>
-          }
-          {
-            thinking && message.text.length == 0 && <div className={styles.message}>Thinking....</div>
-          }
-        </div>
         <div className={styles.inputWrapper}>
           <input onKeyDown={(e) => {
             if (e.key === "Enter") handlePrompt()
           }} onChange={(e) => setPrompt({ author: 'user', text: e.target.value })} value={prompt.text} className={styles.input} type="text" />
-          <button disabled={thinking} className={thinking ? 'disabledBtn' : ""} onClick={handlePrompt}>
-            <ArrowUp strokeWidth={1.8} />
+          <button disabled={thinking || prompt.text.length == 0} className={thinking || prompt.text.length == 0 ? 'disabledBtn' : ""} onClick={handlePrompt}>
+            <ArrowUp strokeWidth={2.4} />
           </button>
 
         </div>

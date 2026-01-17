@@ -1,4 +1,5 @@
-import { run } from '@openai/agents';
+import { OrderState } from './../../../shared/types';
+import { InputGuardrailTripwireTriggered, OutputGuardrailTripwireTriggered, run } from '@openai/agents';
 import { RequestHandler } from "express";
 import client from "../config/openai";
 import agent from '../agent/llm.agent';
@@ -41,13 +42,21 @@ export const streamLLMResponseHandler: RequestHandler = async (req, res) => {
     if (!conversationId || typeof conversationId !== 'string' || !conversationId.startsWith('conv_')) return res.fail(400, "BAD_REQUEST", "Invalid Conversation")
 
 
-    const stream = await run(agent, prompt, { conversationId, stream: true })
+    const orderState: OrderState | undefined = req.body.orderState
+    if (!orderState) return res.fail(400, "BAD_REQUEST", "Invalid order session")
 
-    stream.toTextStream({ compatibleWithNodeStreams: true }).on('data', (e) => {
-        res.write(e.toString())
 
-    }).on('end', () => {
-        res.end()
-    })
+
+
+
+
+
+
+
+
+    const result = await run(agent, prompt, { conversationId, context: orderState })
+
+    res.success(200, result.finalOutput)
+
 
 }

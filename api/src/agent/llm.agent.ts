@@ -1,16 +1,18 @@
+import { AgentOutputTypeSchema } from '../schemas/schemas';
 import 'dotenv/config'
-import { Agent, run } from "@openai/agents";
-import { stdout } from 'node:process';
-
-import client from '../config/openai';
+import { Agent } from "@openai/agents";
 import tools from './tools';
+import { inputGuardrails } from './guards';
+
 
 
 const agent = new Agent({
     name: "Walter White",
-    instructions: `You are an expert waiter for MY restaurant. `,
+    instructions: `You are an expert waiter for MY restaurant.`,
     model: 'gpt-4o-mini',
-    tools
+    tools,
+    inputGuardrails,
+    outputType: AgentOutputTypeSchema
 });
 
 export default agent;
