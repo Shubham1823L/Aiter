@@ -40,7 +40,7 @@ const Messages = ({ messages, thinking, handleChoiceSubmission }: MessagesProps)
                                     {
                                         msg.ui && <form className={styles.form}>
                                             {msg.ui.options.map(option => {
-
+                                                
                                                 return (
                                                     <div className={styles.formInputWrapper}>
                                                         <label className={styles.formLabel} htmlFor={option.product_id + i}>

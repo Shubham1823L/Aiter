@@ -11,6 +11,8 @@ export const addToCartTool = tool({
     }),
     execute: async () => {
         // For this project/case we don't need to do anything tbh
-        return `Acknowledege addition of product and make an appropriate response asking to select something more(whatever suits according to current selections) if it makes sense ALONG WITH UI OPTIONS(compulsory when asking more), otherwise ask for confirmation for finalizing order`
+        return `Acknowledege addition of product and make an appropriate response asking to select something more(whatever suits according to current selections) if it makes sense ALONG WITH UI OPTIONS(compulsory when asking more), otherwise ask for confirmation for finalizing order.
+        IMPORTANT:
+        Generally people want starters first, then main course , then desserts. I want u to sell maximum products and also satisfy our customers, therefore recommend accordingly`
     }
 })
