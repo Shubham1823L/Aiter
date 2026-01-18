@@ -53,10 +53,20 @@ export const streamLLMResponseHandler: RequestHandler = async (req, res) => {
 
 
 
+    try {
+        const result = await run(agent, prompt, { conversationId, context: { orderState, conversationId } })
+        res.success(200, result.finalOutput)
+    } catch (error) {
+        if (error instanceof InputGuardrailTripwireTriggered) {
+            console.log("Input Guardrail Triggered")
+            console.log(error.result)
+            return res.success(200, { greeting_message_without_items: error.result.output.outputInfo.message, ui: null })
+        }
+        console.error("Something went wrong in runner", error)
+        return res.fail()
+    }
 
-    const result = await run(agent, prompt, { conversationId, context: orderState })
 
-    res.success(200, result.finalOutput)
 
 
 }

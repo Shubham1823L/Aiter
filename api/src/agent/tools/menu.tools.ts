@@ -1,5 +1,5 @@
 import { tool } from "@openai/agents";
-import { getCategories, getProducts } from "../../services/menuService";
+import { getCategories, getProduct, getProducts } from "../../services/menuService";
 import * as z from "zod";
 import prisma from "../../config/prisma";
 import embed from "../../utils/embed";
@@ -42,6 +42,24 @@ export const getProductsTool = tool({
         try {
             const products = await getProducts(id)
             return products
+        } catch (error) {
+            console.error('Something went wrong')
+            return "Sorry, nothing found"
+        }
+    }
+})
+
+
+export const getProductTool = tool({
+    name: 'get_product',
+    description: "Returns product details when productId is passed",
+    parameters: z.object({
+        productId: z.string().describe("Product Id")
+    }),
+    execute: async ({ productId }) => {
+        try {
+            const product = await getProduct(productId)
+            return product
         } catch (error) {
             console.error('Something went wrong')
             return "Sorry, nothing found"
